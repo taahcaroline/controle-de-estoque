@@ -1,0 +1,140 @@
+{% extends 'index.html' %}
+{% block content %}
+  <h2>Baixa de Estoque</h2>
+  <div class="container mt-4">
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- Campos de movimentação -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label for="tipo_movimentacao" class="form-label">Tipo de Movimentação</label>
+          <select name="tipo_movimentacao" id="tipo_movimentacao" class="form-control" required>
+            <option value="">Selecione o tipo</option>
+            <option value="baixa">Baixa por requisição</option>
+            <option value="transferencia">Transferência</option>
+            <option value="devolucao">Devolução</option>
+            <option value="vencidos">Validade vencida</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label for="requisitante" class="form-label">Estabelecimento Requisitante</label>
+          <input type="text" name="requisitante" id="requisitante" class="form-control" required>
+        </div>
+      </div>
+
+      <!-- Container de itens -->
+      <div id="itens-container">
+        <!-- Primeira linha de item -->
+        <div class="item-baixa row g-3 mb-3">
+          <div class="col-md-4">
+            <label>Produto</label>
+            <select name="produto_id[]" class="form-control produto-select" onchange="carregarLotes(this)">
+              <option value="">Selecione um produto</option>
+              {% for produto in produtos %}
+                <option value="{{ produto.id }}">{{ produto.nome }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label>Lote</label>
+            <select name="lote_id[]" class="form-control lote-select" onchange="preencherCampos(this)">
+              <option value="">Selecione um lote</option>
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label>Quantidade</label>
+            <input type="number" name="quantidade_baixada[]" class="form-control" required>
+          </div>
+
+          <div class="col-md-2">
+            <label>Validade</label>
+            <input type="text" class="form-control validade" readonly>
+          </div>
+
+          <div class="col-md-3">
+            <label>Fabricante</label>
+            <input type="text" class="form-control fornecedor" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão adicionar item -->
+      <button type="button" class="btn btn-secondary mt-3" onclick="adicionarItem()">+ Adicionar Item</button>
+
+      <!-- Botão de enviar -->
+      <button type="submit" class="btn btn-danger mt-3">Baixar Estoque</button>
+    </form>
+
+    {% if messages %}
+      <div class="mt-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}  
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function adicionarItem() {
+      const container = document.getElementById('itens-container');
+      const firstItem = container.querySelector('.item-baixa');
+      const newItem = firstItem.cloneNode(true);
+
+      newItem.querySelectorAll('input, select').forEach(el => el.value = '');
+      container.appendChild(newItem);
+    }
+
+    function carregarLotes(selectProduto) {
+      const produtoId = selectProduto.value;
+      const itemRow = selectProduto.closest('.item-baixa');
+      const loteSelect = itemRow.querySelector('.lote-select');
+
+      loteSelect.innerHTML = '<option value="">Carregando...</option>';
+      if (!produtoId) {
+        loteSelect.innerHTML = '<option value="">Selecione um produto primeiro</option>';
+        return;
+      }
+
+      fetch(`/get_lotes/${produtoId}/`)
+        .then(response => response.json())
+        .then(data => {
+          loteSelect.innerHTML = '<option value="">Selecione um lote</option>';
+          if (data.lotes.length === 0) {
+            loteSelect.innerHTML = '<option value="">Nenhum lote encontrado</option>';
+          } else {
+            data.lotes.forEach(lote => {
+              const option = document.createElement('option');
+              option.value = lote.id;
+              option.textContent = `${lote.lote} - ${lote.descricao} - Val: ${lote.validade} - Fornecedor: ${lote.fornecedor}`;
+              option.setAttribute('data-lote', lote.lote);
+              option.setAttribute('data-validade', lote.validade);
+              option.setAttribute('data-fornecedor', lote.fornecedor);
+              loteSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(err => {
+          console.error('Erro ao carregar os lotes:', err);
+          loteSelect.innerHTML = '<option value="">Erro ao carregar</option>';
+        });
+    }
+
+    function preencherCampos(selectLote) {
+      const itemRow = selectLote.closest('.item-baixa');
+      const selectedOption = selectLote.options[selectLote.selectedIndex];
+
+      if (!selectedOption) return;
+
+      itemRow.querySelector('.validade').value = selectedOption.getAttribute('data-validade') || '';
+      itemRow.querySelector('.fornecedor').value = selectedOption.getAttribute('data-fornecedor') || '';
+
+      // deixar apenas o código do lote visível no select
+      selectedOption.textContent = selectedOption.getAttribute('data-lote');
+    }
+  </script>
+{% endblock %}

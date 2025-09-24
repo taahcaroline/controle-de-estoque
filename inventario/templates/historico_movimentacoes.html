@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+{% block content %}
+  <h2>Histórico de Movimentações</h2>
+
+  <div class="container mt-4">
+    {% if movimentacoes %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Requisitante</th>
+            <th>PDF</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mov in movimentacoes %}
+            <tr>
+              <td>{{ mov.id }}</td>
+              <td>{{ mov.data|date:"d/m/Y H:i" }}</td>
+              <td>{{ mov.get_tipo_movimentacao_display }}</td>
+              <td>{{ mov.requisitante }}</td>
+              <td>
+                <a href="{% url 'gerar_relatorio_pdf' mov.id %}" class="btn btn-outline-primary btn-sm" target="_blank">
+                  📄 Ver PDF
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Nenhuma movimentação registrada ainda.</p>
+    {% endif %}
+  </div>
+{% endblock %}

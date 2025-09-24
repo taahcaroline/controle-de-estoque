@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Baixa de Estoque</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Baixa de Estoque</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Lote</th>
+                <th>Quantidade Baixada</th>
+                <th>Validade</th>
+                <th>Fornecedor</th>
+                <th>Tipo de Movimentação</th>
+                <th>Requisitante</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movimentacao in movimentacoes %}
+                <tr>
+                    <td>{{ movimentacao.produto.nome }}</td>
+                    <td>{{ movimentacao.lote }}</td>
+                    <td>{{ movimentacao.quantidade }}</td>
+                    <td>{{ movimentacao.validade }}</td>
+                    <td>{{ movimentacao.fornecedor }}</td>
+                    <td>{{ movimentacao.origem }}</td>
+                    <td>{{ movimentacao.requisitante }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Gerado em: {{ now|date:"d/m/Y H:i" }}</p>
+    </div>
+</body>
+</html>

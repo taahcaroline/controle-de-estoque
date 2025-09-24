@@ -1,0 +1,11 @@
+{% extends 'index.html' %}
+{% block content %}
+<h2>Excluir Item</h2>
+<p>Tem certeza que deseja excluir <b>{{ item.produto.nome }}</b> (lote {{ item.lote }})?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sim, excluir</button>
+    <a href="{% url 'estoque' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

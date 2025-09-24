@@ -1,0 +1,36 @@
+{% extends 'index.html' %}
+{% block content %}
+  <h2>Relatório de Consumo por Período</h2>
+
+  <div class="container mt-4">
+    {% if erro %}
+      <div class="alert alert-danger">{{ erro }}</div>
+    {% endif %}
+    <form method="get" class="row g-3">
+      <div class="col-md-3">
+        <label>Data Início</label>
+        <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio|default:'' }}" required>
+      </div>
+      <div class="col-md-3">
+        <label>Data Fim</label>
+        <input type="date" name="data_fim" class="form-control" value="{{ data_fim|default:'' }}" required>
+      </div>
+      <div class="col-md-3">
+        <label for="produto_id">Produto (Opcional)</label>
+        <select name="produto_id" class="form-control">
+          <option value="">Todos</option>
+          {% for p in produtos %}
+            <option value="{{ p.id }}" {% if p.id|stringformat:"s" == produto_id %}selected{% endif %}>{{ p.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="requisitante">Requisitante (Opcional)</label>
+        <input type="text" name="requisitante" class="form-control" value="{{ requisitante|default:'' }}">
+      </div>
+      <div class="col-md-12 mt-3">
+        <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

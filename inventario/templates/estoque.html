@@ -1,0 +1,67 @@
+{% extends 'index.html' %}
+{% block content %}
+<h2>Lista de Estoque</h2>
+
+<!-- Form de filtros -->
+<form method="get" class="mb-3 row g-2 align-items-center">
+    <div class="col-md-6">
+        <input type="text" name="q" class="form-control" placeholder="Buscar por produto, lote ou fornecedor" value="{{ busca }}">
+    </div>
+    <div class="col-md-4">
+        <select name="filtro" class="form-select">
+            <option value="">-- Todos --</option>
+            <option value="disponivel" {% if filtro == "disponivel" %}selected{% endif %}>Disponíveis</option>
+            <option value="vencidos" {% if filtro == "vencidos" %}selected{% endif %}>Vencidos</option>
+            <option value="validade_proxima" {% if filtro == "validade_proxima" %}selected{% endif %}>Validade Próxima</option>
+            <option value="estoque_baixo" {% if filtro == "estoque_baixo" %}selected{% endif %}>Estoque Baixo</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+    </div>
+</form>
+
+<!-- Tabela de estoque -->
+<div class="container mt-4">
+<table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Unidade</th>
+            <th>Lote</th>
+            <th>Validade</th>
+            <th>Fornecedor</th>
+            <th>Quantidade</th>
+            <th>Unidade</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in itens %}
+        <tr 
+            {% if item.validade < today %} class="table-danger" 
+            {% elif item.validade <= today|add:"30" %} class="table-warning" 
+            {% elif item.quantidade < 10 %} class="table-info" 
+            {% endif %}
+        >
+            <td>{{ item.produto.nome }}</td>
+            <td>{{ item.produto.descricao }}</td>
+            <td>{{ item.lote }}</td>
+            <td>{{ item.validade|date:"d/m/Y" }}</td>
+
+            <td>{{ item.fornecedor }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>{{ item.unidade }}</td>
+            <td>
+                <a href="{% url 'editar_item' item.id %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'excluir_item' item.id %}" class="btn btn-sm btn-danger">Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">Nenhum item encontrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table></div>
+{% endblock %}

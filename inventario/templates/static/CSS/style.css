@@ -1,0 +1,141 @@
+nav{
+    background-color: #d6d7e7;
+    border-radius: 8px;
+    box-shadow: inset 5px 5px 5px 5px   #9ca6bf;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+nav > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+
+nav li {
+    display: inline;
+    margin: 0 0 0 15px;    
+}
+ nav ul li {
+    position: relative;
+  } 
+
+nav a {
+    /* text-transform: uppercase; */
+    display: block;
+    color: #000000;
+    /* font-weight: bold; */
+    font-size: 16px;
+    text-decoration: none;
+    font-family: "Rubik", sans-serif;
+}
+
+nav ul li ul {
+    display: none;           /* escondido por padrão */
+    position: absolute;
+    top: 100%;               /* abaixo do item pai */
+    left: 0;
+    background-color: #d6d7e7;
+    box-shadow: inset 5px 5px 5px 5px   #9ca6bf;
+    min-width: 100px;  
+    padding: 0;
+    margin: 0;
+  }
+
+  nav ul li ul li {
+    width: 100%;
+  }
+
+  /* Mostrar submenu ao passar mouse */
+  nav ul li:hover > ul {
+    display: block;
+  }
+
+  /* Links do submenu */
+  nav ul li ul li a {
+    padding: 10px;
+  }
+/* Ajuste geral dos inputs */
+#id_produto, #id_lote, #id_validade, #id_quantidade, 
+#id_fornecedor, #id_unidade_medida, #id_cadproduto {
+    width: 100%;
+    height: 30px;
+    background-color: #ffffff; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    
+    
+}
+
+
+#id_lote, #id_validade, #id_quantidade {
+    margin-right: 0; /* Remove espaçamento extra */
+    
+}
+/* Ajuste apenas para o campo Produto do cadastro */
+#id_nome {
+    width: 100%;          /* ocupa toda a largura */
+    height: 35px;         /* aumenta a altura */
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 10px;    /* deixa o texto mais confortável */
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    border-top: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    
+}
+
+form .form-label {
+    font-family: "Rubik", sans-serif;
+    font-size: 16px !important;
+    color: #333 !important;
+    font-optical-sizing: auto;
+    font-weight: weight;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+form .form-control {
+    font-family: "Rubik", sans-serif;
+    font-size: 16px !important;
+    color: #333 !important;
+    font-optical-sizing: auto;
+    font-weight: weight;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+
+
+/* Botão */
+button[type="submit"] {
+    display: block;
+    width: 200px;
+    margin: 20px auto 0;
+}
+
+
+
+
+.color1 {color: #000000;}
+.color2 {color: #171924;}
+.color3 {color: #565967;}
+.color4 {color: #9ca6bf;}
+.color5 {color: #d6d7e7;}

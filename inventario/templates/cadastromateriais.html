@@ -1,0 +1,77 @@
+
+{% extends 'index.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Cadastro de Materiais{% endblock %}
+{% block content %}
+<h2>Cadastro</h2>
+
+<div class="container mt-4">
+ 
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Nome -->
+        <div class="row mb-3">
+          
+          <div class="col-md-7">
+            <label for="id_origem" class="form-label">Origem</label>
+            <div class="d-flex gap-4">
+            {{ form.origem }}
+           
+          </div></div></div>
+        <div class="row mb-3">
+          
+            <div class="col-md-7">
+              <label for="id_produto" class="form-label">Produto</label>
+              {{ form.produto }}
+             
+            </div></div>
+       <!-- Lote + Validade + Quantidade -->
+       <div class="row mb-3">
+        <div class="col-md-3">
+          <label for="id_lote" class="form-label">Lote</label>
+          {{ form.lote }}
+        </div> 
+          <div class="col-md-3">
+            <label for="id_validade" class="form-label">Validade</label>
+            {{ form.validade }}
+          </div>
+            <div class="col-md-3">
+              <label for="id_quantidade" class="form-label">Quantidade</label>
+              {{ form.quantidade }}
+            </div>
+                <div class="col-md-3">
+                    <label for="id_unidade_medida" class="form-label">Unidade de Medida</label>
+                    <div class="d-flex gap-4">
+                    {{ form.unidade }}
+                </div></div>
+
+</div>
+
+
+
+        
+
+        <!-- Unidade de Medida + Fornecedor -->
+        <div class="row mb-3">
+                
+                <div class="col-md-7">
+                    <label for="id_fornecedor" class="form-label">Fabricante</label>
+                    {{ form.fornecedor }}
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Salvar</button>
+    </form>
+    {% if messages %}
+    <div class="mt-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
