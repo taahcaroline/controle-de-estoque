@@ -13,7 +13,10 @@ urlpatterns = [
      path("estoque/<int:item_id>/excluir/", views.excluir_item, name="excluir_item"),
      path('relatorio/<int:movimentacao_id>/', views.gerar_relatorio_pdf, name='gerar_relatorio_pdf'),
      path('historico/', views.historico_movimentacoes, name='historico_movimentacoes'),
-     path('relatorio-periodo/', views.relatorio_consumo_periodo, name='relatorio_consumo_periodo'),
+     path('relatorio-periodo/', views.relatorio_consumo_periodo, name='relatorio_consumo_periodo'),  
+     path('entradas/', views.historico_entradas, name='historico_entradas'),
+     path('relatorio-entrada/<int:cadastroitens_id>/', views.gerar_relatorio_entrada_pdf, name='gerar_relatorio_entrada_pdf'),
+
 ]
 
 

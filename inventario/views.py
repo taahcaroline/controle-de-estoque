@@ -1,21 +1,18 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import CadastroitensForm, CadastroprodutoForm
-from .models import Cadastroitens, Produto
+from .forms import CadastroitensForm, CadastroprodutoForm, MovimentacaoForm, MovimentacaoItemForm
+from .models import Cadastroitens, Produto, Movimentacao, MovimentacaoItem
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.utils.timezone import now
 from datetime import timedelta
-from django.http import HttpResponse
 from datetime import datetime
 from django.db.models import Sum
-
-
 from django.template.loader import render_to_string
 from fpdf import FPDF
-from .models import Movimentacao, MovimentacaoItem
+
 
 
 # Create your views here.
@@ -24,20 +21,69 @@ def home(request):
 
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import CadastroitensForm
+from .models import Cadastroitens
 
-
-    
 def cadastro(request):
     if request.method == 'POST':
-        form = CadastroitensForm(request.POST)
-        if form.is_valid():
-            form.save()  # Salva o novo item no banco de dados
-            messages.success(request, 'Produto cadastrado com sucesso!')
-            return redirect('cadastro')
+        origem = request.POST.get('origem')
+        produtos = request.POST.getlist('produto')
+        lotes = request.POST.getlist('lote')
+        validades = request.POST.getlist('validade')
+        quantidades = request.POST.getlist('quantidade')
+        unidades = request.POST.getlist('unidade')
+        fornecedores = request.POST.getlist('fornecedor')
+
+        total_itens = len(produtos)
+
+        for i in range(total_itens):
+            data = {
+                'origem': origem,
+                'produto': produtos[i],
+                'lote': lotes[i],
+                'validade': validades[i],
+                'quantidade': quantidades[i],
+                'unidade': unidades[i],
+                'fornecedor': fornecedores[i],
+            }
+
+            form = CadastroitensForm(data)
+
+            if form.is_valid():
+                produto = form.cleaned_data['produto']
+                lote = form.cleaned_data['lote']
+                validade = form.cleaned_data['validade']
+
+                item_existente = Cadastroitens.objects.filter(
+                    produto=produto,
+                    lote=lote,
+                    validade=validade
+                ).first()
+
+                if item_existente:
+                    item_existente.quantidade += form.cleaned_data['quantidade']
+                    item_existente.unidade = form.cleaned_data['unidade']
+                    item_existente.fornecedor = form.cleaned_data['fornecedor']
+                    item_existente.origem = form.cleaned_data['origem']
+                    item_existente.save()
+
+                    messages.success(request, f'Estoque atualizado para o produto "{produto}".')
+                else:
+                    form.save()
+                    messages.success(request, f'Produto "{produto}" cadastrado com sucesso!')
+            else:
+                errors = form.errors.as_text()
+                messages.error(request, f'Erro ao cadastrar item {i+1}: {errors}')
+
+        return redirect('cadastro')
+
     else:
         form = CadastroitensForm()
 
-    return render(request, 'cadastromateriais.html', {'form': form})    
+    return render(request, 'cadastromateriais.html', {'form': form})
+  
 
     
 def cadastroproduto(request):
@@ -53,48 +99,6 @@ def cadastroproduto(request):
     return render(request, 'cadastroproduto.html', {'form': form})    
 
 
-
-# ------------------ Baixa de estoque múltipla ------------------
-# def baixa_estoque(request):
-#     produtos = Produto.objects.all()  # Carrega todos os produtos
-
-#     if request.method == 'POST':
-#         tipo_mov = request.POST.get('tipo_movimentacao')
-#         requisitante = request.POST.get('requisitante')
-
-#         # Pegando listas de itens
-#         produto_ids = request.POST.getlist('produto_id[]')
-#         lote_ids = request.POST.getlist('lote_id[]')
-#         quantidades = request.POST.getlist('quantidade_baixada[]')
-
-#         for produto_id, lote_id, qtd in zip(produto_ids, lote_ids, quantidades):
-#             try:
-#                 quantidade_baixada = int(qtd)
-#             except ValueError:
-#                 messages.error(request, 'Quantidade inválida.')
-#                 continue
-
-#             try:
-#                 item = Cadastroitens.objects.get(id=lote_id, produto_id=produto_id)
-#             except Cadastroitens.DoesNotExist:
-#                 messages.error(request, f'Lote ou produto não encontrado (produto {produto_id}).')
-#                 continue
-
-#             if quantidade_baixada > item.quantidade:
-#                 messages.error(request, f'Quantidade insuficiente no lote {item.lote}.')
-#             else:
-#                 item.quantidade -= quantidade_baixada
-#                 item.save()
-#                 messages.success(
-#                     request,
-#                     f"{quantidade_baixada} unidades de '{item.produto.nome}' (lote {item.lote}) baixadas com sucesso. "
-#                     f"Tipo: {tipo_mov}, Requisitante: {requisitante}"
-#                 )
-
-#         return redirect('baixa')  # Só retorna depois de processar o POST
-
-#     # Apenas GET ou outros métodos
-#     return render(request, 'baixa.html', {'produtos': produtos})
 
 def baixa_estoque(request):
     produtos = Produto.objects.all()
@@ -126,7 +130,8 @@ def baixa_estoque(request):
                 movimentacao=movimentacao,
                 produto=item.produto,
                 lote=item,
-                quantidade_baixada=quantidade_baixada
+                quantidade_baixada=quantidade_baixada,
+                descricao=item.produto,
             )
 
         messages.success(request, "Movimentação registrada com sucesso.")
@@ -178,6 +183,80 @@ def estoque(request):
         'filtro': filtro,
         'today': hoje, })
 
+def estoquegeral(request):
+    busca = request.GET.get('q')
+    filtro = request.GET.get('filtro')
+    hoje = now().date()
+    prazo_curto = hoje + timedelta(days=30)
+
+    # Itens agrupados (resumo por lote)
+    itens_agrupados = (
+        Cadastroitens.objects
+        .values(
+            'produto',
+            'produto__nome',
+            'produto__descricao',
+            'lote',
+            'validade',
+            'fornecedor',
+            'unidade',
+        )
+        .annotate(
+            quantidade_total=Sum('quantidade')
+        )
+        .order_by('produto__nome', 'validade')
+    )
+
+    # Itens individuais (detalhados)
+    itens_individuais = Cadastroitens.objects.select_related('produto').all().order_by('produto__nome', 'validade')
+
+    # Filtros
+    if busca:
+        itens_agrupados = itens_agrupados.filter(
+            Q(produto__nome__icontains=busca) |
+            Q(fornecedor__icontains=busca) |
+            Q(lote__icontains=busca)
+        )
+        itens_individuais = itens_individuais.filter(
+            Q(produto__nome__icontains=busca) |
+            Q(fornecedor__icontains=busca) |
+            Q(lote__icontains=busca)
+        )
+
+    if filtro == "vencidos":
+        itens_agrupados = itens_agrupados.filter(validade__lt=hoje)
+        itens_individuais = itens_individuais.filter(validade__lt=hoje)
+    elif filtro == "validade_proxima":
+        itens_agrupados = itens_agrupados.filter(validade__range=[hoje, prazo_curto])
+        itens_individuais = itens_individuais.filter(validade__range=[hoje, prazo_curto])
+    elif filtro == "estoque_baixo":
+        itens_agrupados = itens_agrupados.filter(quantidade_total__lt=10)
+        itens_individuais = itens_individuais.filter(quantidade__lt=10)
+    elif filtro == "disponivel":
+        itens_agrupados = itens_agrupados.filter(quantidade_total__gt=0, validade__gte=hoje)
+        itens_individuais = itens_individuais.filter(quantidade__gt=0, validade__gte=hoje)
+
+    return render(request, 'estoquegeral.html', {
+        'itens_agrupados': itens_agrupados,
+        'itens_individuais': itens_individuais,
+        'busca': busca,
+        'filtro': filtro,
+        'today': hoje,
+    })
+
+
+
+def editar_lote(request, produto_id, lote):
+    itens = Cadastroitens.objects.filter(produto_id=produto_id, lote=lote)
+
+    if request.method == 'POST':
+        nova_quantidade = request.POST.get('quantidade')
+        for item in itens:
+            item.quantidade = nova_quantidade
+            item.save()
+        return redirect('estoquegeral')
+
+    return render(request, 'editar_lote.html', {'itens': itens})
 
 def editar_estoque(request, item_id):
     item = get_object_or_404(Cadastroitens, id=item_id)
@@ -203,10 +282,6 @@ def excluir_item(request, item_id):
 
 
 
-
-from django.http import HttpResponse
-from fpdf import FPDF
-
 def gerar_relatorio_pdf(request, movimentacao_id):
     movimentacao = Movimentacao.objects.get(id=movimentacao_id)
     itens = movimentacao.itens.all()
@@ -215,30 +290,46 @@ def gerar_relatorio_pdf(request, movimentacao_id):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    pdf.cell(200, 10, txt="Relatório de Baixa de Estoque", ln=True, align="C")
+    pdf.cell(200, 10, txt="Relatório de Saída", ln=True, align="C")
     pdf.ln(10)
 
     pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, f"Tipo: {movimentacao.get_tipo_movimentacao_display()}", ln=True)
-    pdf.cell(0, 10, f"Requisitante: {movimentacao.requisitante}", ln=True)
+    pdf.cell(0, 10, f"Requisitante: {movimentacao.requisitante or 'N/A'}", ln=True)
     pdf.cell(0, 10, f"Data: {movimentacao.data.strftime('%d/%m/%Y %H:%M')}", ln=True)
     pdf.ln(5)
 
+    # Cabeçalho da tabela
     pdf.set_font("Arial", 'B', 10)
     pdf.cell(40, 10, "Produto", border=1)
     pdf.cell(30, 10, "Lote", border=1)
     pdf.cell(30, 10, "Validade", border=1)
-    pdf.cell(30, 10, "Fabricante", border=1)
+    pdf.cell(30, 10, "Fornecedor", border=1)
     pdf.cell(30, 10, "Quantidade", border=1)
+    pdf.cell(30, 10, "Unidade", border=1)
     pdf.ln()
 
+    # Conteúdo dos itens
     pdf.set_font("Arial", size=10)
     for item in itens:
-        pdf.cell(40, 10, item.produto.nome, border=1)
-        pdf.cell(30, 10, item.lote.lote, border=1)
-        pdf.cell(30, 10, item.lote.validade.strftime('%d/%m/%Y'), border=1)
-        pdf.cell(30, 10, item.lote.fornecedor, border=1)
-        pdf.cell(30, 10, str(item.quantidade_baixada), border=1)
+        nome_produto = str(item.produto.nome or 'N/A')
+        lote_codigo = str(item.lote.lote or 'N/A')
+        validade = item.lote.validade.strftime('%d/%m/%Y') if item.lote.validade else 'N/A'
+        fornecedor = str(item.lote.fornecedor or 'N/A')
+        quantidade = str(item.quantidade_baixada or 0)
+
+        # Tratamento da unidade (campo do Cadastroitens)
+        try:
+            unidade = item.lote.get_unidade_display()
+        except AttributeError:
+            unidade = 'N/A'
+
+        pdf.cell(40, 10, nome_produto, border=1)
+        pdf.cell(30, 10, lote_codigo, border=1)
+        pdf.cell(30, 10, validade, border=1)
+        pdf.cell(30, 10, fornecedor, border=1)
+        pdf.cell(30, 10, quantidade, border=1)
+        pdf.cell(30, 10, unidade, border=1)
         pdf.ln()
 
     # Gera o conteúdo do PDF em memória
@@ -248,8 +339,6 @@ def gerar_relatorio_pdf(request, movimentacao_id):
     response['Content-Disposition'] = 'inline; filename="baixa_estoque.pdf"'
     return response
 
-from django.shortcuts import render
-from .models import Movimentacao
 
 def historico_movimentacoes(request):
     movimentacoes = Movimentacao.objects.all().order_by('-data')  # mais recentes primeiro
@@ -257,9 +346,6 @@ def historico_movimentacoes(request):
     return render(request, 'historico_movimentacoes.html', {
         'movimentacoes': movimentacoes
     })
-
-
-
 
 
 
@@ -323,4 +409,50 @@ def relatorio_consumo_periodo(request):
     # Página inicial (sem GET)
     return render(request, 'relatorio_periodo.html', {
         'produtos': produtos
+    })
+
+def gerar_relatorio_entrada_pdf(request, cadastroitens_id):
+    lote = Cadastroitens.objects.get(id=cadastroitens_id)
+
+    # Gera o PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.cell(200, 10, txt="Relatório de Entrada", ln=True, align="C")
+    pdf.ln(10)
+
+    pdf.set_font("Arial", size=10)
+    pdf.cell(0, 10, f"Data de Entrada: {lote.data.strftime('%d/%m/%Y %H:%M')}", ln=True)
+    pdf.cell(0, 10, f"Origem: {lote.get_origem_display()}", ln=True)
+    pdf.ln(5)
+
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(40, 10, "Produto", border=1)
+    pdf.cell(30, 10, "Lote", border=1)
+    pdf.cell(30, 10, "Validade", border=1)
+    pdf.cell(40, 10, "Fornecedor", border=1)
+    pdf.cell(30, 10, "Quantidade", border=1)
+    pdf.cell(30, 10, "Unidade", border=1)
+    pdf.ln()
+
+    pdf.set_font("Arial", size=10)
+    pdf.cell(40, 10, lote.produto.nome, border=1)
+    pdf.cell(30, 10, lote.lote, border=1)
+    pdf.cell(30, 10, lote.validade.strftime('%d/%m/%Y'), border=1)
+    pdf.cell(40, 10, lote.fornecedor, border=1)
+    pdf.cell(30, 10, str(lote.quantidade), border=1)
+    pdf.cell(30, 10, lote.get_unidade_display(), border=1)
+    pdf.ln()
+
+    # Retorna o PDF
+    pdf_output = pdf.output(dest='S').encode('latin1')
+    response = HttpResponse(pdf_output, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="entrada_estoque.pdf"'
+    return response
+
+def historico_entradas(request):
+    entradas = Cadastroitens.objects.order_by('-data')
+    return render(request, 'historico_entrada.html', {
+        'movimentacoes': entradas
     })

@@ -1,25 +1,37 @@
 {% extends 'index.html' %}
 {% block content %}
-<h2>Lista de Estoque</h2>
+<h3>Lista de Estoque</h3>
 
 <!-- Form de filtros -->
-<form method="get" class="mb-3 row g-2 align-items-center">
-    <div class="col-md-6">
+<form method="get" class="mb-3">
+    <div class="row gx-2 align-items-center">
+      
+      <!-- Campo de busca -->
+      <div class="col-md-5">
         <input type="text" name="q" class="form-control" placeholder="Buscar por produto, lote ou fornecedor" value="{{ busca }}">
-    </div>
-    <div class="col-md-4">
+      </div>
+  
+      <!-- Select de filtro -->
+      <div class="col-md-4">
         <select name="filtro" class="form-select">
-            <option value="">-- Todos --</option>
-            <option value="disponivel" {% if filtro == "disponivel" %}selected{% endif %}>Disponíveis</option>
-            <option value="vencidos" {% if filtro == "vencidos" %}selected{% endif %}>Vencidos</option>
-            <option value="validade_proxima" {% if filtro == "validade_proxima" %}selected{% endif %}>Validade Próxima</option>
-            <option value="estoque_baixo" {% if filtro == "estoque_baixo" %}selected{% endif %}>Estoque Baixo</option>
+          <option value="">-- Todos --</option>
+          <option value="disponivel" {% if filtro == "disponivel" %}selected{% endif %}>Disponíveis</option>
+          <option value="vencidos" {% if filtro == "vencidos" %}selected{% endif %}>Vencidos</option>
+          <option value="validade_proxima" {% if filtro == "validade_proxima" %}selected{% endif %}>Validade Próxima</option>
+          <option value="estoque_baixo" {% if filtro == "estoque_baixo" %}selected{% endif %}>Estoque Baixo</option>
         </select>
+      </div>
+  
+      <!-- Botão Filtrar -->
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-80">Filtrar</button>
+      </div>
+  
     </div>
-    <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-    </div>
-</form>
+  </form>
+  
+</div>
+
 
 <!-- Tabela de estoque -->
 <div class="container mt-4">

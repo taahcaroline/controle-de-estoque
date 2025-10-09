@@ -36,34 +36,17 @@ class Cadastroitens(models.Model):
     
     unidade = models.CharField('Unidade de Medida', max_length=5, choices=UNIDADE_MEDIDA_CHOICES, default='UN')
     origem = models.CharField('Origem', max_length=15, choices=ORIGEM_CHOICES, default='Almoxarifado')
+    data = models.DateTimeField(auto_now_add=True)
     
 
     def __str__(self):
         return f"{self.lote} - {self.produto.nome}"
     
-# class Cadastroitens(models.Model):
-#     produto = models.CharField('Produto', max_length=100)
-#     lote = models.CharField('Lote', max_length=15)
-#     validade = models.DateField('Validade')
-#     fornecedor = models.CharField('Fabricante', max_length=50)
-#     quantidade = models.IntegerField('Quantidade')
-     
-    
-#     UNIDADE_MEDIDA_CHOICES = [
-#         ('UN', 'Unidade'),
-#         ('CX', 'Caixa'),
-#         ('PCT', 'PCT'),
-#     ] 
-    
-#     unidade = models.CharField('Unidade de Medida', max_length=5, choices=UNIDADE_MEDIDA_CHOICES, default='UN')
-    
-#     def __str__(self):
-#         return f"{self.produto} - {self.lote}"
 
-# models.py
 
 class Movimentacao(models.Model):
     TIPO_CHOICES = [
+        ('entrada', 'Entrada'),
         ('baixa', 'Baixa por requisição'),
         ('transferencia', 'Transferência'),
         ('devolucao', 'Devolução'),

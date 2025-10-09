@@ -27,7 +27,12 @@
           </li>
         <li><a class="menu" href="{% url 'baixa' %}">Saída</a></li>
         <li><a href="{% url 'estoque' %}">Estoque</a></li>
-        <li><a class="nav-link" href="{% url 'historico_movimentacoes' %}">📚 Histórico de Baixas</a></li>
+        <li><a href="#">Relatórios ▾</a>
+        <ul>
+          <li><a href="{% url 'historico_movimentacoes' %}">Histórico de Baixas</a></li>
+          <li><a href="{% url 'relatorio_consumo_periodo' %}">Consumo por período</a></li>
+        </ul></li>
+        
     </ul>
  </nav>   
 

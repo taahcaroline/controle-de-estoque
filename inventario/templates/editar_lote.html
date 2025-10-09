@@ -1,0 +1,18 @@
+<h3>Editar Lote: {{ itens.0.produto.nome }} - Lote {{ itens.0.lote }}</h3>
+<form method="post">
+    {% csrf_token %}
+    <div class="container mt-4">
+    <label>Nova Quantidade para todos:</label>
+    <input type="number" name="quantidade" class="form-control" required>
+    <label>Nova Validade para todos:</label>
+    <input type="date" name="validade" class="form-control">
+    <button type="submit" class="btn btn-success mt-2">Salvar</button>
+</form>
+
+<h4 class="mt-4">Itens neste lote</h4>
+<ul>
+    {% for item in itens %}
+    <li>ID {{ item.id }} - Quantidade: {{ item.quantidade }} - Validade: {{ item.validade }}</li>
+    {% endfor %}
+</ul>
+</div>

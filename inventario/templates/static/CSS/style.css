@@ -57,6 +57,41 @@ nav ul li ul {
   nav ul li ul li a {
     padding: 10px;
   }
+
+  .relatorio-baixa {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+h1 .h1-relatorios {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+h3{
+    padding-top: 20px;
+    text-align: center;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+table, th, td {
+    border: 1px solid #ddd;
+}
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 10px;
+}
 /* Ajuste geral dos inputs */
 #id_produto, #id_lote, #id_validade, #id_quantidade, 
 #id_fornecedor, #id_unidade_medida, #id_cadproduto {
