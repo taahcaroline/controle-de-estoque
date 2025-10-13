@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Registrar no sistema{% endblock %}
+{% block content %}
+<div class="login d-flex justify-content-center"> 
+    <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+    <h2 class="text-center mb-4">Registrar no sistema</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ next }}">
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+                    </form>
+                    <p class="change-form-p">Já possui uma conta? <a href="{% url 'login' %}">Fazer login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

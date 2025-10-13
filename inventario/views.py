@@ -1,7 +1,7 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import CadastroitensForm, CadastroprodutoForm, MovimentacaoForm, MovimentacaoItemForm
+from .forms import CadastroitensForm, CadastroprodutoForm, CustomLoginForm, RegistroUsuarioForm
 from .models import Cadastroitens, Produto, Movimentacao, MovimentacaoItem
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -12,8 +12,47 @@ from datetime import datetime
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from fpdf import FPDF
+from django.contrib.auth import authenticate, login, logout
 
+def registrar(request):
+    if request.method == 'POST':
+        form = RegistroUsuarioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cadastro realizado com sucesso!')
+            return redirect('login')  
+    else:
+        form = RegistroUsuarioForm()
+    
+    return render(request, 'registration/register.html', {'form': form})
 
+def login_view(request):
+    if request.method == 'POST':
+        form = CustomLoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            
+            # Autenticar o usuário
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Bem-vindo, {user.username}!')
+                return redirect('home')  # Redirecionar para a página inicial ou outro destino
+            else:
+                messages.error(request, 'Usuário ou senha incorretos.')
+        else:
+            messages.error(request, 'Há erros no formulário. Corrija e tente novamente.')
+    else:
+        form = CustomLoginForm()
+
+    return render(request, 'registration/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Você saiu da sua conta com sucesso.')
+    return redirect('login')  # Redireciona para a página de login
 
 # Create your views here.
 def home(request):
@@ -21,10 +60,7 @@ def home(request):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import CadastroitensForm
-from .models import Cadastroitens
+
 
 def cadastro(request):
     if request.method == 'POST':

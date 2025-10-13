@@ -23,10 +23,9 @@ nav li {
   } 
 
 nav a {
-    /* text-transform: uppercase; */
+  
     display: block;
     color: #000000;
-    /* font-weight: bold; */
     font-size: 16px;
     text-decoration: none;
     font-family: "Rubik", sans-serif;
@@ -38,14 +37,16 @@ nav ul li ul {
     top: 100%;               /* abaixo do item pai */
     left: 0;
     background-color: #d6d7e7;
-    box-shadow: inset 5px 5px 5px 5px   #9ca6bf;
-    min-width: 100px;  
+    box-shadow: inset 5px 5px 5px 5px   #9ca6bf;  
     padding: 0;
     margin: 0;
+    
   }
 
   nav ul li ul li {
-    width: 100%;
+    padding: 0; 
+    height: 40px;
+
   }
 
   /* Mostrar submenu ao passar mouse */
@@ -54,8 +55,18 @@ nav ul li ul {
   }
 
   /* Links do submenu */
-  nav ul li ul li a {
-    padding: 10px;
+  nav ul li ul li a {   
+    height: 100%;
+    display: flex;           /* Flexbox para centralizar */
+    align-items: center;     /* Centralização vertical */
+    height: 100%;            /* Ocupa toda a altura do <li> */
+    padding: 0 15px;         /* Espaçamento lateral */
+    text-decoration: none;
+    color: #000;
+    font-family: "Rubik", sans-serif;
+    font-size: 16px;
+    white-space: nowrap;
+
   }
 
   .relatorio-baixa {
@@ -158,6 +169,18 @@ form .form-control {
 }
 
 
+form .form-group {
+    font-family: "Rubik", sans-serif;
+    font-size: 16px !important;
+    color: #333 !important;
+    font-optical-sizing: auto;
+    font-weight: weight;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+    padding-top: 10px;
+}
+
+
 
 /* Botão */
 button[type="submit"] {
@@ -166,9 +189,17 @@ button[type="submit"] {
     margin: 20px auto 0;
 }
 
+.login{
+    margin-top: 20px;
+}
 
-
-
+.card{
+    margin: 0 auto;
+}
+.jumbotron{
+    padding-top: 20px;
+    margin: 0 20px 20px;
+}
 .color1 {color: #000000;}
 .color2 {color: #171924;}
 .color3 {color: #565967;}

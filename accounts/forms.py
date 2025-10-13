@@ -19,3 +19,13 @@ class RegisterForm(UserCreationForm):
             user.save()
             return user
         
+        
+class CustomLoginForm(forms.Form):
+    username = forms.CharField(
+        label='Nome de Usuário',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    password = forms.CharField(
+        label='Senha',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )        

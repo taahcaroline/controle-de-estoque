@@ -29,7 +29,7 @@
         <!-- Primeira linha de item -->
         <div class="item-baixa row g-3 mb-3">
           <div class="col-md-4">
-            <label>Produto</label>
+            <label class="form-label">Produto</label>
             <select name="produto_id[]" class="form-control produto-select" onchange="carregarLotes(this)">
               <option value="">Selecione um produto</option>
               {% for produto in produtos %}
@@ -39,24 +39,24 @@
           </div>
 
           <div class="col-md-3">
-            <label>Lote</label>
+            <label class="form-label">Lote</label>
             <select name="lote_id[]" class="form-control lote-select" onchange="preencherCampos(this)">
               <option value="">Selecione um lote</option>
             </select>
           </div>
 
           <div class="col-md-2">
-            <label>Quantidade</label>
+            <label class="form-label">Quantidade</label>
             <input type="number" name="quantidade_baixada[]" class="form-control" required>
           </div>
 
           <div class="col-md-2">
-            <label>Validade</label>
+            <label class="form-label">Validade</label>
             <input type="text" class="form-control validade" readonly>
           </div>
 
           <div class="col-md-3">
-            <label>Fabricante</label>
+            <label class="form-label">Fabricante</label>
             <input type="text" class="form-control fornecedor" readonly>
           </div>
         </div>

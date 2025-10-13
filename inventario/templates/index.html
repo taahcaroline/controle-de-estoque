@@ -17,7 +17,7 @@
     <!-- Menu -->
  <nav>
     <ul>
-        <li><a class="menu" href="#">Inicio</a></li>
+        <li><a class="menu" href="{% url 'home' %}">Inicio</a></li>
         <li>
             <a href="#">Cadastro ▾</a>
             <ul>
@@ -29,18 +29,57 @@
         <li><a href="{% url 'estoque' %}">Estoque</a></li>
         <li><a href="#">Relatórios ▾</a>
         <ul>
-          <li><a href="{% url 'historico_movimentacoes' %}">Histórico de Baixas</a></li>
+          <li><a href="{% url 'historico_movimentacoes' %}">Histórico de baixas</a></li>
+          <li><a href="{% url 'historico_entradas' %}">Histórico de entrada</a></li>
           <li><a href="{% url 'relatorio_consumo_periodo' %}">Consumo por período</a></li>
+    
         </ul></li>
         
     </ul>
+    
+    {% if user.is_authenticated %}
+    <li><a class="menu" href="{% url 'logout' %}">Sair</a></li>
+    {% else %}
+    <li><a class="menu" href="{% url 'login' %}">Login</a></li>
+    {% endif %}
  </nav>   
 
  <body>
   
         {% block content %}
+        <div class="jumbotron">
+          <h1 class="display-4">Seja bem vindo</h1>
+          <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+          <hr class="my-4">
+        </div>
+        
+        <div class="row">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Entrada</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Realize entradas de itens para controlar o que entra no estoque</p>
+           
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;"> 
+          <div class="card-body">
+            <h5 class="card-title">Saída</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Realize baixas nos itens para controlar o fluxo</p>
+            
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;"> 
+          <div class="card-body">
+            <h5 class="card-title">Relatórios</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Gere relatórios de entrada, saída e consumo</p>
+            
+          </div>
+        </div>
+      </div>
         {% endblock %}
-    
 </body>
 
 </html>

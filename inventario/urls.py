@@ -16,6 +16,9 @@ urlpatterns = [
      path('relatorio-periodo/', views.relatorio_consumo_periodo, name='relatorio_consumo_periodo'),  
      path('entradas/', views.historico_entradas, name='historico_entradas'),
      path('relatorio-entrada/<int:cadastroitens_id>/', views.gerar_relatorio_entrada_pdf, name='gerar_relatorio_entrada_pdf'),
+     path('accounts/login/', views.login_view, name='login'),
+     path('accounts/logout/', views.logout_view, name='logout'),
+      path('accounts/register/', views.registrar, name='register'),
 
 ]
 
