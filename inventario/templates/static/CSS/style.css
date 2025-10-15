@@ -1,138 +1,178 @@
-nav{
+header {
+    display: flex;               /* Alinha imagem e texto lado a lado */
+    align-items: center;         /* Centraliza verticalmente */
+    height: 100px;               /* Altura fixa do cabeçalho */
+    background-color: #d9e2ff;   /* Cor de fundo opcional */
+    padding: 0 20px;
+    overflow: hidden;            /* Evita que a imagem extrapole */
+}
+
+/* Imagem no canto esquerdo */
+header img {
+    height: 100%;                /* Ocupa toda a altura do header */
+    width: auto;                 /* Mantém proporção */
+    max-width: 200px;            /* Limita a largura da imagem */
+    object-fit: cover;
+}
+
+/* Texto do cabeçalho */
+header p {
+    margin: 0 auto;           /* Espaço entre imagem e texto */
+    font-size: 16px;
+    text-align: center;
+    font-family: "Rubik", sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+/* Estilos gerais de navegação */
+nav, nav ul, nav li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
     background-color: #d6d7e7;
     border-radius: 8px;
-    box-shadow: inset 5px 5px 5px 5px   #9ca6bf;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    box-shadow: inset 5px 5px 5px 5px #9ca6bf;
+    display: flex;
+    justify-content: space-between; /* Alinha os itens principais do menu */
+    padding: 10px 20px; /* Adiciona espaçamento dentro do nav */
+}
+
+nav > ul {
     display: flex;
 }
-nav > ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-  }
 
 nav li {
-    display: inline;
-    margin: 0 0 0 15px;    
-}
- nav ul li {
     position: relative;
-  } 
+    display: inline-block;
+    margin-left: 20px;
+}
+
+nav li ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #d6d7e7;
+    box-shadow: inset 5px 5px 5px 5px #9ca6bf;
+    padding: 0;
+    margin: 0;
+    z-index: 10;
+}
+
+nav li:hover > ul {
+    display: block;
+}
 
 nav a {
-  
     display: block;
-    color: #000000;
+    color: #000;
     font-size: 16px;
     text-decoration: none;
     font-family: "Rubik", sans-serif;
 }
 
-nav ul li ul {
-    display: none;           /* escondido por padrão */
-    position: absolute;
-    top: 100%;               /* abaixo do item pai */
-    left: 0;
-    background-color: #d6d7e7;
-    box-shadow: inset 5px 5px 5px 5px   #9ca6bf;  
+nav li ul li {
     padding: 0;
-    margin: 0;
-    
-  }
-
-  nav ul li ul li {
-    padding: 0; 
     height: 40px;
+    margin: 0 auto;
+}
 
-  }
-
-  /* Mostrar submenu ao passar mouse */
-  nav ul li:hover > ul {
-    display: block;
-  }
-
-  /* Links do submenu */
-  nav ul li ul li a {   
+nav li ul li a {
     height: 100%;
-    display: flex;           /* Flexbox para centralizar */
-    align-items: center;     /* Centralização vertical */
-    height: 100%;            /* Ocupa toda a altura do <li> */
-    padding: 0 15px;         /* Espaçamento lateral */
-    text-decoration: none;
-    color: #000;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
     font-family: "Rubik", sans-serif;
     font-size: 16px;
     white-space: nowrap;
-
-  }
-
-  .relatorio-baixa {
-    font-family: Arial, sans-serif;
-    font-size: 12px;
 }
+
+/* Ajustes para a área de login */
+nav .login-area {
+    display: flex;
+    justify-content: flex-end; /* Alinha os itens à direita */
+    align-items: center;
+    margin-left: 20px; /* Espaço à esquerda dos itens de login */
+    margin-right: 20px; /* Adiciona margem à direita para afastar um pouco do canto */
+}
+
+nav .login-area li {
+    margin-left: 15px; /* Diminui a distância entre os itens de login */
+}
+
+nav .login-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+nav .login-menu a {
+    font-size: 16px;
+    color: #000;
+    font-weight: normal;
+}
+
+/* Estilos de formatação de texto */
 h1 .h1-relatorios {
     text-align: center;
     font-size: 18px;
     margin-bottom: 20px;
 }
 
-h3{
+h3 {
     padding-top: 20px;
     text-align: center;
 }
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-table, th, td {
-    border: 1px solid #ddd;
-}
-th, td {
-    padding: 8px;
-    text-align: left;
-}
-th {
-    background-color: #f2f2f2;
-}
+
 .footer {
     text-align: center;
     margin-top: 30px;
     font-size: 10px;
 }
-/* Ajuste geral dos inputs */
-#id_produto, #id_lote, #id_validade, #id_quantidade, 
-#id_fornecedor, #id_unidade_medida, #id_cadproduto {
+
+/* Estilos de tabela */
+table {
     width: 100%;
-    height: 30px;
-    background-color: #ffffff; 
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 5px 10px;
-    font-size: 0.95rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    
-    
+    border-collapse: collapse;
+    margin-bottom: 20px;
 }
 
-
-#id_lote, #id_validade, #id_quantidade {
-    margin-right: 0; /* Remove espaçamento extra */
-    
+table, th, td {
+    border: 1px solid #ddd;
 }
-/* Ajuste apenas para o campo Produto do cadastro */
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Estilos de inputs */
+#id_produto, #id_lote, #id_validade, #id_quantidade,
+#id_fornecedor, #id_unidade_medida, #id_cadproduto,
 #id_nome {
-    width: 100%;          /* ocupa toda a largura */
-    height: 35px;         /* aumenta a altura */
+    width: 100%;
     background-color: #ffffff;
     border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 8px 10px;    /* deixa o texto mais confortável */
-    font-size: 1rem;
+    font-size: 0.95rem;
+    padding: 5px 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#id_lote, #id_validade, #id_quantidade {
+    margin-right: 0;  /* Remove espaçamento extra */
+}
+
+#id_nome {
+    height: 35px;  /* Aumenta a altura */
+    font-size: 1rem;  /* Ajuste no tamanho da fonte */
+    padding: 8px 10px;  /* Deixa o texto mais confortável */
 }
 
 /* Container */
@@ -145,30 +185,11 @@ th {
     border: 1px solid #ccc;
     border-top: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    
 }
 
-form .form-label {
-    font-family: "Rubik", sans-serif;
-    font-size: 16px !important;
-    color: #333 !important;
-    font-optical-sizing: auto;
-    font-weight: weight;
-    font-style: normal;
-    font-variation-settings: "wdth" 100;
-}
-
-form .form-control {
-    font-family: "Rubik", sans-serif;
-    font-size: 16px !important;
-    color: #333 !important;
-    font-optical-sizing: auto;
-    font-weight: weight;
-    font-style: normal;
-    font-variation-settings: "wdth" 100;
-}
-
-
+/* Formatação dos campos de formulário */
+form .form-label,
+form .form-control,
 form .form-group {
     font-family: "Rubik", sans-serif;
     font-size: 16px !important;
@@ -177,10 +198,11 @@ form .form-group {
     font-weight: weight;
     font-style: normal;
     font-variation-settings: "wdth" 100;
-    padding-top: 10px;
 }
 
-
+form .form-group {
+    padding-top: 10px;
+}
 
 /* Botão */
 button[type="submit"] {
@@ -189,17 +211,21 @@ button[type="submit"] {
     margin: 20px auto 0;
 }
 
-.login{
+/* Estilos adicionais */
+.login {
     margin-top: 20px;
 }
 
-.card{
+.card {
     margin: 0 auto;
 }
-.jumbotron{
+
+.jumbotron {
     padding-top: 20px;
     margin: 0 20px 20px;
 }
+
+
 .color1 {color: #000000;}
 .color2 {color: #171924;}
 .color3 {color: #565967;}

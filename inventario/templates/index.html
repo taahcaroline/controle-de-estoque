@@ -10,39 +10,53 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Zalando+Sans+SemiExpanded:ital,wght@0,200..900;1,200..900&family=Zalando+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-straight/css/uicons-regular-straight.css'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
     <title>Document</title>
 </head>
 <body>
-   
+  <header>
+    
+    <img src="{% static 'imagens/logo.png' %}" alt="Logo EstokCloud">
+    <p>Sistema inteligente de controle de estoque</p>
+  </header>
     <!-- Menu -->
- <nav>
-    <ul>
-        <li><a class="menu" href="{% url 'home' %}">Inicio</a></li>
-        <li>
-            <a href="#">Cadastro ▾</a>
-            <ul>
-              <li><a href="{% url 'cadastro' %}">Lotes</a></li>
-              <li><a href="{% url 'cadastroproduto' %}">Produtos</a></li>
-            </ul>
+    <nav>
+      <ul>
+          <li><a class="menu" href="{% url 'home' %}">Inicio</a></li>
+          <li>
+              <a href="#">Cadastro ▾</a>
+              <ul>
+                <li><a href="{% url 'cadastro' %}">Lotes</a></li>
+                <li><a href="{% url 'cadastroproduto' %}">Produtos</a></li>
+              </ul>
+            </li>
+          <li><a class="menu" href="{% url 'baixa' %}">Saída</a></li>
+          <li><a href="{% url 'estoque' %}">Estoque</a></li>
+          <li><a href="#">Relatórios ▾</a>
+          <ul>
+            <li><a href="{% url 'historico_movimentacoes' %}">Histórico de baixas</a></li>
+            <li><a href="{% url 'historico_entradas' %}">Histórico de entrada</a></li>
+            <li><a href="{% url 'relatorio_consumo_periodo' %}">Consumo por período</a></li>
+          </ul></li>
+      </ul>
+  
+      <ul class="login-area">
+          <li class="login-name">
+              {% if user.is_authenticated %}
+                  <span>Bem-vindo(a), {{ user.first_name|default:user.username }}!</span>
+              {% else %}
+                  <span>Bem-vindo(a), visitante!</span>
+              {% endif %}
           </li>
-        <li><a class="menu" href="{% url 'baixa' %}">Saída</a></li>
-        <li><a href="{% url 'estoque' %}">Estoque</a></li>
-        <li><a href="#">Relatórios ▾</a>
-        <ul>
-          <li><a href="{% url 'historico_movimentacoes' %}">Histórico de baixas</a></li>
-          <li><a href="{% url 'historico_entradas' %}">Histórico de entrada</a></li>
-          <li><a href="{% url 'relatorio_consumo_periodo' %}">Consumo por período</a></li>
-    
-        </ul></li>
-        
-    </ul>
-    
-    {% if user.is_authenticated %}
-    <li><a class="menu" href="{% url 'logout' %}">Sair</a></li>
-    {% else %}
-    <li><a class="menu" href="{% url 'login' %}">Login</a></li>
-    {% endif %}
- </nav>   
+          {% if user.is_authenticated %}
+              <li class="login-menu"><a class="menu" href="{% url 'logout' %}">➡️ Sair</a></li>
+          {% else %}
+              <li class="login-menu"><a class="menu" href="{% url 'login' %}">⬅️ Fazer login</a></li>
+          {% endif %}
+      </ul>
+  </nav>
+  
 
  <body>
   

@@ -5,11 +5,9 @@ from .forms import CadastroitensForm, CadastroprodutoForm, CustomLoginForm, Regi
 from .models import Cadastroitens, Produto, Movimentacao, MovimentacaoItem
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils.timezone import now
-from datetime import timedelta
-from datetime import datetime
-from django.db.models import Sum
+from datetime import timedelta, datetime
 from django.template.loader import render_to_string
 from fpdf import FPDF
 from django.contrib.auth import authenticate, login, logout
@@ -33,13 +31,13 @@ def login_view(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             
-            # Autenticar o usuário
+           
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Bem-vindo, {user.username}!')
-                return redirect('home')  # Redirecionar para a página inicial ou outro destino
+                # messages.success(request, f'Bem-vindo, {user.username}!')
+                return redirect('home') 
             else:
                 messages.error(request, 'Usuário ou senha incorretos.')
         else:
@@ -52,9 +50,9 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, 'Você saiu da sua conta com sucesso.')
-    return redirect('login')  # Redireciona para a página de login
+    return redirect('login') 
 
-# Create your views here.
+
 def home(request):
     return render(request, 'index.html')
 
@@ -175,7 +173,7 @@ def baixa_estoque(request):
 
     return render(request, 'baixa.html', {'produtos': produtos})
 
-# ------------------ Retorna lotes via AJAX ------------------
+
 def get_lotes(request, produto_id):
     lotes = Cadastroitens.objects.filter(produto_id=produto_id).select_related('produto').values(
         'id', 'lote', 'validade', 'fornecedor', 'produto__descricao'
@@ -219,80 +217,6 @@ def estoque(request):
         'filtro': filtro,
         'today': hoje, })
 
-def estoquegeral(request):
-    busca = request.GET.get('q')
-    filtro = request.GET.get('filtro')
-    hoje = now().date()
-    prazo_curto = hoje + timedelta(days=30)
-
-    # Itens agrupados (resumo por lote)
-    itens_agrupados = (
-        Cadastroitens.objects
-        .values(
-            'produto',
-            'produto__nome',
-            'produto__descricao',
-            'lote',
-            'validade',
-            'fornecedor',
-            'unidade',
-        )
-        .annotate(
-            quantidade_total=Sum('quantidade')
-        )
-        .order_by('produto__nome', 'validade')
-    )
-
-    # Itens individuais (detalhados)
-    itens_individuais = Cadastroitens.objects.select_related('produto').all().order_by('produto__nome', 'validade')
-
-    # Filtros
-    if busca:
-        itens_agrupados = itens_agrupados.filter(
-            Q(produto__nome__icontains=busca) |
-            Q(fornecedor__icontains=busca) |
-            Q(lote__icontains=busca)
-        )
-        itens_individuais = itens_individuais.filter(
-            Q(produto__nome__icontains=busca) |
-            Q(fornecedor__icontains=busca) |
-            Q(lote__icontains=busca)
-        )
-
-    if filtro == "vencidos":
-        itens_agrupados = itens_agrupados.filter(validade__lt=hoje)
-        itens_individuais = itens_individuais.filter(validade__lt=hoje)
-    elif filtro == "validade_proxima":
-        itens_agrupados = itens_agrupados.filter(validade__range=[hoje, prazo_curto])
-        itens_individuais = itens_individuais.filter(validade__range=[hoje, prazo_curto])
-    elif filtro == "estoque_baixo":
-        itens_agrupados = itens_agrupados.filter(quantidade_total__lt=10)
-        itens_individuais = itens_individuais.filter(quantidade__lt=10)
-    elif filtro == "disponivel":
-        itens_agrupados = itens_agrupados.filter(quantidade_total__gt=0, validade__gte=hoje)
-        itens_individuais = itens_individuais.filter(quantidade__gt=0, validade__gte=hoje)
-
-    return render(request, 'estoquegeral.html', {
-        'itens_agrupados': itens_agrupados,
-        'itens_individuais': itens_individuais,
-        'busca': busca,
-        'filtro': filtro,
-        'today': hoje,
-    })
-
-
-
-def editar_lote(request, produto_id, lote):
-    itens = Cadastroitens.objects.filter(produto_id=produto_id, lote=lote)
-
-    if request.method == 'POST':
-        nova_quantidade = request.POST.get('quantidade')
-        for item in itens:
-            item.quantidade = nova_quantidade
-            item.save()
-        return redirect('estoquegeral')
-
-    return render(request, 'editar_lote.html', {'itens': itens})
 
 def editar_estoque(request, item_id):
     item = get_object_or_404(Cadastroitens, id=item_id)
@@ -368,7 +292,7 @@ def gerar_relatorio_pdf(request, movimentacao_id):
         pdf.cell(30, 10, unidade, border=1)
         pdf.ln()
 
-    # Gera o conteúdo do PDF em memória
+    # Gera o conteúdo do PDF 
     pdf_output = pdf.output(dest='S').encode('latin1')
 
     response = HttpResponse(pdf_output, content_type='application/pdf')
