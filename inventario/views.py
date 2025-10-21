@@ -11,6 +11,7 @@ from datetime import timedelta, datetime
 from django.template.loader import render_to_string
 from fpdf import FPDF
 from django.contrib.auth import authenticate, login, logout
+from io import BytesIO
 
 def registrar(request):
     if request.method == 'POST':
@@ -47,6 +48,7 @@ def login_view(request):
 
     return render(request, 'registration/login.html', {'form': form})
 
+@login_required
 def logout_view(request):
     logout(request)
     messages.success(request, 'Você saiu da sua conta com sucesso.')
@@ -59,7 +61,7 @@ def home(request):
 
 
 
-
+@login_required
 def cadastro(request):
     if request.method == 'POST':
         origem = request.POST.get('origem')
@@ -119,7 +121,7 @@ def cadastro(request):
     return render(request, 'cadastromateriais.html', {'form': form})
   
 
-    
+@login_required    
 def cadastroproduto(request):
     if request.method == 'POST':
         form = CadastroprodutoForm(request.POST)
@@ -133,7 +135,7 @@ def cadastroproduto(request):
     return render(request, 'cadastroproduto.html', {'form': form})    
 
 
-
+@login_required
 def baixa_estoque(request):
     produtos = Produto.objects.all()
 
@@ -173,7 +175,7 @@ def baixa_estoque(request):
 
     return render(request, 'baixa.html', {'produtos': produtos})
 
-
+@login_required
 def get_lotes(request, produto_id):
     lotes = Cadastroitens.objects.filter(produto_id=produto_id).select_related('produto').values(
         'id', 'lote', 'validade', 'fornecedor', 'produto__descricao'
@@ -190,7 +192,7 @@ def get_lotes(request, produto_id):
         })
     return JsonResponse({'lotes': lotes_data})
 
-
+@login_required
 def estoque(request):
     busca = request.GET.get('q')
     filtro = request.GET.get('filtro')
@@ -217,7 +219,7 @@ def estoque(request):
         'filtro': filtro,
         'today': hoje, })
 
-
+@login_required
 def editar_estoque(request, item_id):
     item = get_object_or_404(Cadastroitens, id=item_id)
     if request.method == "POST":
@@ -230,7 +232,7 @@ def editar_estoque(request, item_id):
         form = CadastroitensForm(instance=item)
     return render(request, 'editar_estoque.html', {'form': form, 'item': item})
 
-
+@login_required
 def excluir_item(request, item_id):
     item = get_object_or_404(Cadastroitens, id=item_id)
     if request.method == "POST":
@@ -241,7 +243,7 @@ def excluir_item(request, item_id):
 
 
 
-
+@login_required
 def gerar_relatorio_pdf(request, movimentacao_id):
     movimentacao = Movimentacao.objects.get(id=movimentacao_id)
     itens = movimentacao.itens.all()
@@ -250,26 +252,50 @@ def gerar_relatorio_pdf(request, movimentacao_id):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    pdf.cell(200, 10, txt="Relatório de Saída", ln=True, align="C")
+    # -------------------------
+    # Título
+    # -------------------------
+    pdf.cell(0, 10, "Relatório de Saída", ln=True, align="C")
     pdf.ln(10)
 
+    # -------------------------
+    # Informações da movimentação
+    # -------------------------
     pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, f"Tipo: {movimentacao.get_tipo_movimentacao_display()}", ln=True)
     pdf.cell(0, 10, f"Requisitante: {movimentacao.requisitante or 'N/A'}", ln=True)
     pdf.cell(0, 10, f"Data: {movimentacao.data.strftime('%d/%m/%Y %H:%M')}", ln=True)
     pdf.ln(5)
 
-    # Cabeçalho da tabela
+    # -------------------------
+    # Definição de colunas
+    # -------------------------
+    columns = [
+        {"title": "Produto", "width": 60},
+        {"title": "Lote", "width": 25},
+        {"title": "Validade", "width": 25},
+        {"title": "Fornecedor", "width": 30},
+        {"title": "Quantidade", "width": 25},
+        {"title": "Descrição", "width": 30},
+    ]
+
+    # Cabeçalho
     pdf.set_font("Arial", 'B', 10)
-    pdf.cell(40, 10, "Produto", border=1)
-    pdf.cell(30, 10, "Lote", border=1)
-    pdf.cell(30, 10, "Validade", border=1)
-    pdf.cell(30, 10, "Fornecedor", border=1)
-    pdf.cell(30, 10, "Quantidade", border=1)
-    pdf.cell(30, 10, "Unidade", border=1)
+    for col in columns:
+        pdf.cell(col["width"], 10, col["title"], border=1, align='C')
     pdf.ln()
 
-    # Conteúdo dos itens
+    # -------------------------
+    # Função para calcular número de linhas de um texto
+    # -------------------------
+    def calc_lines(text, col_width, line_height):
+        """Calcula o número de linhas necessárias para um texto, considerando a largura da coluna"""
+        # Aproximação simples: largura do texto / largura da coluna
+        return max(1, int(pdf.get_string_width(text) / col_width) + 1)
+
+    # -------------------------
+    # Conteúdo
+    # -------------------------
     pdf.set_font("Arial", size=10)
     for item in itens:
         nome_produto = str(item.produto.nome or 'N/A')
@@ -277,29 +303,44 @@ def gerar_relatorio_pdf(request, movimentacao_id):
         validade = item.lote.validade.strftime('%d/%m/%Y') if item.lote.validade else 'N/A'
         fornecedor = str(item.lote.fornecedor or 'N/A')
         quantidade = str(item.quantidade_baixada or 0)
+        descricao_item = item.produto.descricao or 'N/A'
 
-        # Tratamento da unidade (campo do Cadastroitens)
-        try:
-            unidade = item.lote.get_unidade_display()
-        except AttributeError:
-            unidade = 'N/A'
+        # Altura de cada linha do nome_produto reduzida
+        line_height = 6  # menor que 10 para aproximar linhas quebradas
 
-        pdf.cell(40, 10, nome_produto, border=1)
-        pdf.cell(30, 10, lote_codigo, border=1)
-        pdf.cell(30, 10, validade, border=1)
-        pdf.cell(30, 10, fornecedor, border=1)
-        pdf.cell(30, 10, quantidade, border=1)
-        pdf.cell(30, 10, unidade, border=1)
-        pdf.ln()
+        # Calcula número de linhas necessárias para o nome_produto
+        lines_produto = calc_lines(nome_produto, 60, line_height)
+        total_height = line_height * lines_produto
 
-    # Gera o conteúdo do PDF 
+        # Salva posição inicial
+        x_start = pdf.get_x()
+        y_start = pdf.get_y()
+
+        # Produto com quebra de linha e espaçamento menor
+        pdf.multi_cell(60, line_height, nome_produto, border=1)
+        pdf.set_xy(x_start + 60, y_start)
+
+        # Outras células seguem a mesma altura total
+        pdf.cell(25, total_height, lote_codigo, border=1)
+        pdf.cell(25, total_height, validade, border=1)
+        pdf.cell(30, total_height, fornecedor, border=1)
+        pdf.cell(25, total_height, quantidade, border=1)
+
+        # Descrição sem quebra de linha
+        pdf.cell(30, total_height, descricao_item, border=1)
+
+        # Ajusta posição para a próxima linha
+        pdf.set_xy(x_start, y_start + total_height)
+
+    # -------------------------
+    # Gera PDF
+    # -------------------------
     pdf_output = pdf.output(dest='S').encode('latin1')
-
     response = HttpResponse(pdf_output, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="baixa_estoque.pdf"'
     return response
 
-
+@login_required
 def historico_movimentacoes(request):
     movimentacoes = Movimentacao.objects.all().order_by('-data')  # mais recentes primeiro
 
@@ -308,7 +349,7 @@ def historico_movimentacoes(request):
     })
 
 
-
+@login_required
 def relatorio_consumo_periodo(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
@@ -370,7 +411,7 @@ def relatorio_consumo_periodo(request):
     return render(request, 'relatorio_periodo.html', {
         'produtos': produtos
     })
-
+@login_required
 def gerar_relatorio_entrada_pdf(request, cadastroitens_id):
     lote = Cadastroitens.objects.get(id=cadastroitens_id)
 
@@ -390,7 +431,7 @@ def gerar_relatorio_entrada_pdf(request, cadastroitens_id):
     pdf.set_font("Arial", 'B', 10)
     pdf.cell(40, 10, "Produto", border=1)
     pdf.cell(30, 10, "Lote", border=1)
-    pdf.cell(30, 10, "Validade", border=1)
+    pdf.cell(20, 10, "Validade", border=1)
     pdf.cell(40, 10, "Fornecedor", border=1)
     pdf.cell(30, 10, "Quantidade", border=1)
     pdf.cell(30, 10, "Unidade", border=1)
@@ -399,10 +440,10 @@ def gerar_relatorio_entrada_pdf(request, cadastroitens_id):
     pdf.set_font("Arial", size=10)
     pdf.cell(40, 10, lote.produto.nome, border=1)
     pdf.cell(30, 10, lote.lote, border=1)
-    pdf.cell(30, 10, lote.validade.strftime('%d/%m/%Y'), border=1)
+    pdf.cell(20, 10, lote.validade.strftime('%d/%m/%Y'), border=1)
     pdf.cell(40, 10, lote.fornecedor, border=1)
     pdf.cell(30, 10, str(lote.quantidade), border=1)
-    pdf.cell(30, 10, lote.get_unidade_display(), border=1)
+    pdf.cell(30, 10, lote.produto.descricao or 'N/A', border=1)
     pdf.ln()
 
     # Retorna o PDF
@@ -416,3 +457,55 @@ def historico_entradas(request):
     return render(request, 'historico_entrada.html', {
         'movimentacoes': entradas
     })
+    
+@login_required    
+def relatorio_estoque(request):
+    # Obtém todos os produtos do banco de dados
+    produtos = Cadastroitens.objects.all()
+    
+    # Passa os dados para o template
+    return render(request, 'relatorio_estoque.html', {'produtos': produtos})
+
+@login_required
+def relatorio_estoque_pdf(request):
+    # Obtém todos os produtos do banco de dados
+    produtos = Cadastroitens.objects.all()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.cell(200, 10, txt="Relatório de Estoque", ln=True, align="C")
+    pdf.ln(10)
+
+    # Cabeçalhos
+    pdf.set_font("Arial", style="B", size=10)
+    pdf.cell(20, 10, "ID", border=1)
+    pdf.cell(40, 10, "Produto", border=1)
+    pdf.cell(30, 10, "Descrição", border=1)
+    pdf.cell(30, 10, "Lote", border=1)
+    pdf.cell(30, 10, "Validade", border=1)
+    pdf.cell(30, 10, "Quantidade", border=1)
+   
+    pdf.ln()
+    
+   
+
+    # Dados
+    pdf.set_font("Arial", size=10)
+    for p in produtos:
+        pdf.cell(20, 10, str(p.produto.id), border=1)
+        pdf.cell(40, 10, str(p.produto.nome)[:20], border=1)
+        pdf.cell(30, 10, str(p.produto.descricao)[:30], border=1)
+        pdf.cell(30, 10, str(p.lote), border=1)
+        pdf.cell(30, 10, str(p.validade), border=1)
+        pdf.cell(30, 10, str(p.quantidade), border=1)
+        pdf.ln()
+
+    pdf_data = pdf.output(dest='S').encode('latin1')
+   
+
+    # Retorna como resposta HTTP
+    response = HttpResponse(pdf_data, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="relatorio_estoque.pdf"'
+    return response

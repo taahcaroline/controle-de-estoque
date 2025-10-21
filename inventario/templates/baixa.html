@@ -54,10 +54,18 @@
             <label class="form-label">Validade</label>
             <input type="text" class="form-control validade" readonly>
           </div>
-
           <div class="col-md-3">
+            <label class="form-label">Unidade</label>
+            <input type="text" class="form-control descricao" readonly>
+          </div>
+          <div class="col-md-4">
             <label class="form-label">Fabricante</label>
             <input type="text" class="form-control fornecedor" readonly>
+          </div>
+
+          <!-- Botão Remover (não visível no primeiro item) -->
+          <div class="col-md-12 d-flex justify-content-end">
+            <button type="button" class="btn btn-danger btn-remove" onclick="removerItem(this)" style="display:none;">Remover</button>
           </div>
         </div>
       </div>
@@ -85,7 +93,12 @@
       const firstItem = container.querySelector('.item-baixa');
       const newItem = firstItem.cloneNode(true);
 
+      // Limpar valores dos campos
       newItem.querySelectorAll('input, select').forEach(el => el.value = '');
+      
+      // Exibir botão de remover apenas para os itens adicionados
+      newItem.querySelector('.btn-remove').style.display = 'block';
+
       container.appendChild(newItem);
     }
 
@@ -113,6 +126,7 @@
               option.textContent = `${lote.lote} - ${lote.descricao} - Val: ${lote.validade} - Fornecedor: ${lote.fornecedor}`;
               option.setAttribute('data-lote', lote.lote);
               option.setAttribute('data-validade', lote.validade);
+              option.setAttribute('data-descricao', lote.descricao);
               option.setAttribute('data-fornecedor', lote.fornecedor);
               loteSelect.appendChild(option);
             });
@@ -131,10 +145,17 @@
       if (!selectedOption) return;
 
       itemRow.querySelector('.validade').value = selectedOption.getAttribute('data-validade') || '';
+      itemRow.querySelector('.descricao').value = selectedOption.getAttribute('data-descricao') || '';
       itemRow.querySelector('.fornecedor').value = selectedOption.getAttribute('data-fornecedor') || '';
 
-      // deixar apenas o código do lote visível no select
+      // Deixar apenas o código do lote visível no select
       selectedOption.textContent = selectedOption.getAttribute('data-lote');
+    }
+
+    // Função para remover o item
+    function removerItem(button) {
+      const itemRow = button.closest('.item-baixa');
+      itemRow.remove();
     }
   </script>
 {% endblock %}

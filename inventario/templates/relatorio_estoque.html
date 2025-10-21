@@ -1,0 +1,30 @@
+{% extends 'index.html' %}
+{% block content %}
+  <h3>Relatório de Estoque</h3>
+ 
+  <table class="table table-bordered">
+      <thead>
+          <tr>
+              <th>#</th>
+              <th>Produto</th>
+              <th>Descrição</th>
+              <th>Quantidade</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for produto in produtos %}
+          <tr>
+              <td>{{ produto.id }}</td>
+              <td>{{ produto.produto.nome }}</td>
+              <td>{{ produto.produto.descricao }}</td>
+              <td>{{ produto.quantidade }}</td>
+        
+          </tr>
+          {% empty %}
+          <tr>
+              <td colspan="6">Nenhum produto encontrado</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+{% endblock %}

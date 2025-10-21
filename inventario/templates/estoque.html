@@ -4,30 +4,32 @@
 
 <!-- Form de filtros -->
 <form method="get" class="mb-3">
-    <div class="row gx-2 align-items-center">
-      
-      <!-- Campo de busca -->
-      <div class="col-md-5">
-        <input type="text" name="q" class="form-control" placeholder="Buscar por produto, lote ou fornecedor" value="{{ busca }}">
-      </div>
+  <div class="row gx-2 align-items-center justify-content-center" id="busca">  <!-- Campo de busca -->
+    <div class="col-md-5 col-12 text-center">
+      <input type="text" name="q" class="form-control" placeholder="Buscar por produto, lote ou fabricante"   {% if busca and busca != 'none' %}
+      value="{{ busca }}"
+    {% else %}
+      value=""
+    {% endif %}">
+    </div>  
   
-      <!-- Select de filtro -->
-      <div class="col-md-4">
-        <select name="filtro" class="form-select">
-          <option value="">-- Todos --</option>
-          <option value="disponivel" {% if filtro == "disponivel" %}selected{% endif %}>Disponíveis</option>
-          <option value="vencidos" {% if filtro == "vencidos" %}selected{% endif %}>Vencidos</option>
-          <option value="validade_proxima" {% if filtro == "validade_proxima" %}selected{% endif %}>Validade Próxima</option>
-          <option value="estoque_baixo" {% if filtro == "estoque_baixo" %}selected{% endif %}>Estoque Baixo</option>
-        </select>
-      </div>
-  
-      <!-- Botão Filtrar -->
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-80">Filtrar</button>
-      </div>
-  
+    <!-- Select de filtro -->
+    <div class="col-md-4 col-12 text-center">
+      <select name="filtro" class="form-select">
+        <option value="">-- Todos --</option>
+        <option value="disponivel" {% if filtro == "disponivel" %}selected{% endif %}>Disponíveis</option>
+        <option value="vencidos" {% if filtro == "vencidos" %}selected{% endif %}>Vencidos</option>
+        <option value="validade_proxima" {% if filtro == "validade_proxima" %}selected{% endif %}>Validade Próxima</option>
+        <option value="estoque_baixo" {% if filtro == "estoque_baixo" %}selected{% endif %}>Estoque Baixo</option>
+      </select>
     </div>
+  
+    <!-- Botão Filtrar -->
+    <div class="col-md-2 col-12 text-center" id="filtrar">
+      <button type="submit" class="btn btn-primary w-80">Filtrar</button>
+    </div>
+  </div>
+  
   </form>
   
 </div>
@@ -42,7 +44,7 @@
             <th>Unidade</th>
             <th>Lote</th>
             <th>Validade</th>
-            <th>Fornecedor</th>
+            <th>Fabricante</th>
             <th>Quantidade</th>
             <th>Unidade</th>
             <th>Ações</th>
