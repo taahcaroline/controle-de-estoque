@@ -1,0 +1,244 @@
+header {
+    display: flex;               
+    align-items: center;         
+    height: 100px;               
+    background-color: #d9e2ff;   
+    padding: 0 20px;
+    overflow: hidden;            
+}
+
+/* Imagem no canto esquerdo */
+header img {
+    height: 100%;                
+    width: auto;                 
+    max-width: 200px;           
+    object-fit: cover;
+}
+
+/* Texto do cabeçalho */
+header p {
+    margin: 0 auto;          
+    font-size: 16px;
+    text-align: center;
+    font-family: "Rubik", sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+/* Estilos gerais de navegação */
+nav, nav ul, nav li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    background-color: #d6d7e7;
+    border-radius: 8px;
+    box-shadow: inset 5px 5px 5px 5px #9ca6bf;
+    display: flex;
+    justify-content: space-between; 
+    padding: 10px 20px; 
+}
+
+nav > ul {
+    display: flex;
+}
+
+nav li {
+    position: relative;
+    display: inline-block;
+    margin-left: 20px;
+}
+
+nav li ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #d6d7e7;
+    box-shadow: inset 5px 5px 5px 5px #9ca6bf;
+    padding: 0;
+    margin: 0;
+    z-index: 10;
+}
+
+nav li:hover > ul {
+    display: block;
+}
+
+nav a {
+    display: block;
+    color: #000;
+    font-size: 16px;
+    text-decoration: none;
+    font-family: "Rubik", sans-serif;
+}
+
+nav li ul li {
+    padding: 0;
+    height: 40px;
+    margin: 0 auto;
+}
+
+nav li ul li a {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    font-family: "Rubik", sans-serif;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+/* Area de login */
+nav .login-area {
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    margin-left: 20px; 
+    margin-right: 20px; 
+}
+
+nav .login-area li {
+    margin-left: 15px; 
+}
+
+nav .login-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+nav .login-menu a {
+    font-size: 16px;
+    color: #000;
+    font-weight: normal;
+}
+nav .login-name span {
+    display: inline-block;
+    min-width: 200px; 
+    text-align: right; 
+}
+/* Estilos de formatação de texto */
+h1 .h1-relatorios {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+h3 {
+    padding-top: 20px;
+    text-align: center;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 10px;
+}
+
+/* Estilos de tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Estilos de inputs */
+#id_produto, #id_lote, #id_validade, #id_quantidade,
+#id_fornecedor, #id_unidade_medida, #id_cadproduto,
+#id_nome {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    padding: 5px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#id_lote, #id_validade, #id_quantidade {
+    margin-right: 0;  /* Remove espaçamento extra */
+}
+
+#id_nome {
+    height: 35px;  
+    font-size: 1rem;  
+    padding: 8px 10px;  
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    border-top: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Formatação dos campos de formulário */
+form .form-label,
+form .form-control,
+form .form-group {
+    font-family: "Rubik", sans-serif;
+    font-size: 16px !important;
+    color: #333 !important;
+    font-optical-sizing: auto;
+    font-weight: weight;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+form .form-group {
+    padding-top: 10px;
+}
+
+/* Botão */
+button[type="submit"] {
+    display: block;
+    width: 200px;
+    margin: 20px auto 0;
+}
+
+/* Estilos adicionais */
+.login {
+    margin-top: 20px;
+}
+
+.card {
+    margin: 0 auto;
+}
+
+.jumbotron {
+    padding-top: 20px;
+    margin: 0 20px 20px;
+}
+
+#filtrar{
+    margin-top: -18px;
+}
+
+#busca{
+    margin-top:30px;
+}
+
+.color1 {color: #000000;}
+.color2 {color: #171924;}
+.color3 {color: #565967;}
+.color4 {color: #9ca6bf;}
+.color5 {color: #d6d7e7;}

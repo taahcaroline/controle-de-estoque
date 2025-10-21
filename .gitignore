@@ -1,0 +1,5 @@
+# Arquivo de variáveis de ambiente
+.env
+
+# Banco de dados local (se usar SQLite)
+db.sqlite3
