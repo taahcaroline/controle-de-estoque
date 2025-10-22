@@ -3,19 +3,21 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
-# Carrega .env local (para desenvolvimento)
-load_dotenv()
-
+# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY
+# Carrega variáveis de ambiente locais (.env) apenas em modo DEBUG
+if os.getenv("DEBUG", "False") == "True":
+    load_dotenv()
+
+# Segurança
 SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-local-key')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# Permite acesso ao site
-ALLOWED_HOSTS = ['<seu-usuario>.pythonanywhere.com', 'localhost', '127.0.0.1']
+# Hosts permitidos
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
-# INSTALLED APPS
+# Aplicativos instalados
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,8 +25,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Seus apps
     'accounts',
     'inventario.apps.InventarioConfig',
+
+    # Terceiros
     'crispy_forms',
     'crispy_bootstrap5',
     'reportlab',
@@ -33,10 +39,10 @@ INSTALLED_APPS = [
 CRISPY_ALLOWED_TEMPLATE_PACKS = ('bootstrap5',)
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-# MIDDLEWARE
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir arquivos estáticos
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -45,8 +51,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# URLs e WSGI
 ROOT_URLCONF = 'estoquemateriais.urls'
+WSGI_APPLICATION = 'estoquemateriais.wsgi.application'
 
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -63,18 +72,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'estoquemateriais.wsgi.application'
-
-# DATABASES
+# Banco de dados
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
-    # Produção no PythonAnywhere (Postgres)
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
 else:
-    # Desenvolvimento local (SQLite)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -82,7 +87,7 @@ else:
         }
     }
 
-# PASSWORD VALIDATORS
+# Validação de senha
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -90,37 +95,28 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# INTERNATIONALIZATION
+# Internacionalização
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# STATIC FILES
+# Arquivos estáticos
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'inventario' / 'templates' / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Usado no collectstatic
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# LOGIN
+# Se tiver um diretório static/ personalizado, descomente:
+# STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Login/logout
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login'
 
+# Auto field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Redirecionamentos de login/logout
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login'
-
-# Tipo padrão de chave primária
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# Tempo da sessão (em segundos)
+# Sessão
 SESSION_COOKIE_AGE = 60 * 60 * 2  # 2 horas
-
-# Expira automaticamente quando o navegador é fechado
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-
-# Atualiza o tempo de expiração a cada requisição (mantém o login se o usuário estiver ativo)
 SESSION_SAVE_EVERY_REQUEST = True

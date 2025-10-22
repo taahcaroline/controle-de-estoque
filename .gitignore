@@ -1,5 +1,10 @@
-# Arquivo de variáveis de ambiente
-.env
+# Arquivos Python
+*.pyc
+__pycache__/
 
-# Banco de dados local (se usar SQLite)
+# Banco de dados local
+*.db
 db.sqlite3
+
+# Ambiente
+.env
