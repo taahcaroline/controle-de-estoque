@@ -12,7 +12,7 @@ if os.getenv("DEBUG", "False") == "True":
 
 # Segurança
 SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-local-key')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = 'True'
 
 # Hosts permitidos
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
